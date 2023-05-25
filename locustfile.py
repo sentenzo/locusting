@@ -1,9 +1,18 @@
-import os
+import dotenv
+from locust import HttpUser, between, task
 
-from locust import HttpUser, task
+from utils.web_shoot import web_shot
+
+dotenv.load_dotenv()
 
 
-class HelloWorldUser(HttpUser):
+class Locuster(HttpUser):
+    wait_time = between(1, 5)
+
     @task
-    def hello_world(self):
-        self.client.get("/")
+    def user_lands_by_web(self):
+        web_shot(self.client)
+
+    @task
+    def git_pull(self):
+        ...
