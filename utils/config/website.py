@@ -25,6 +25,7 @@ class Project:
 
 
 class Urls:
+    login: str = "/auth/login"
     main: str = f"/project/{User.username}/{Project.name}"
     branches: str = f"/project/{User.username}/{Project.name}/branch"
     tags: str = f"/project/{User.username}/{Project.name}/tag"

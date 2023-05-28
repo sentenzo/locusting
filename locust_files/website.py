@@ -9,7 +9,7 @@ class WebUser(HttpUser):
     wait_time = between(1, 5)
 
     def on_start(self):
-        with self.client.get("/auth/login") as response:
+        with self.client.get(config.urls.login) as response:
             login_csrf = parse_login_csrf(response.text)
         form_data = {
             "_csrf": login_csrf,
@@ -18,7 +18,7 @@ class WebUser(HttpUser):
             "rememberMe": "",
         }
         self.client.post(
-            "/auth/login",
+            config.urls.login,
             data=form_data,
         )
 
