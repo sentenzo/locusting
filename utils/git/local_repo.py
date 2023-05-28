@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import shutil
-from os import path
+import os
 
 from git import Git
+
+
+
+class LocalRepositoryException(Exception):
+    pass
 
 
 class LocalRepository:
@@ -11,16 +16,35 @@ class LocalRepository:
         if not LocalRepository.exists(location):
             LocalRepository.make_from_origin(location, origin_url)
         self.location = location
-        self.repo_git = Git(location)
-        self.git_git = Git(path.join(location, ".git"))
+        self._git = Git(location)
+        self._git_git = Git(os.path.join(location, ".git"))
 
     @staticmethod
     def exists(location):
-        ...
+        pass
 
     @staticmethod
     def make_from_origin(location: str, origin_url: str):
-        ...
+        if not os.path.exists(location):
+            os.makedirs(location, exist_ok=True)
+        if not os.path.isdir(location):
+            raise LocalRepositoryException
+        if len(os.listdir(location)) > 0:
+            # not empty
+            raise LocalRepositoryException
+
+        _git = Git(location)
+        _git.clone(origin_url, ".")
+
+        _git_git = Git(os.path.join(location, ".git"))
+        _git_git.init()
+        _git_git.add(".")
+        _git_git.commit(message="git-git")
+
+
+
+
+
 
     def duplicate(self, dup_location):
         shutil.copytree(self.location, dup_location)
@@ -31,8 +55,3 @@ class LocalRepository:
 
     def revert_pull(self):
         pass
-
-    # git.cmd
-    # https://stackoverflow.com/questions/2472552/python-way-to-clone-a-git-repository
-    # https://stackoverflow.com/questions/15315573/how-can-i-call-git-pull-from-within-python
-    # https://stackoverflow.com/questions/28291909/gitpython-and-ssh-keys
