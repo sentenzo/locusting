@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
 
 
-@dataclass
 class WebsiteConfig:
     user: User
     urls: Urls
@@ -16,19 +14,16 @@ class WebsiteConfig:
         self.project = Project()
 
 
-@dataclass
 class User:
     username: str = os.getenv("USERNAME")
     email: str = os.getenv("EMAIL")
     password: str = os.getenv("PASSWORD")
 
 
-@dataclass
 class Project:
     name: str = os.getenv("REPONAME")
 
 
-@dataclass
 class Urls:
     main: str = f"/project/{User.username}/{Project.name}"
     branches: str = f"/project/{User.username}/{Project.name}/branch"
