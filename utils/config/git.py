@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import os
 
+import dotenv
+
+dotenv.load_dotenv()
+
 
 class GitConfig:
     git_user: GitUser
@@ -19,11 +23,11 @@ class GitUser:
 
 
 class RemoteRepository:
-    clone_url: str = os.getenv("REOPURL")
+    clone_url: str = os.getenv("REPOURL")
 
 
 class LocalRepository:
-    location: str = "./local_repo"
+    location: str = "E:\\test_repo"
 
 
 config = GitConfig()
