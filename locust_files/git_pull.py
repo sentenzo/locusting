@@ -10,9 +10,12 @@ class GitUser(User):
     wait_time = between(1, 5)
 
     def on_start(self):
-        local_repo_original = LocalRepository(config.local_repo.location)
+        local_repo_original = LocalRepository(
+            config.local_repo.location,
+            config.remote_repo.clone_url,
+        )
         temp_dir = TemporaryDirectory()
-        local_repo_duplicate = local_repo_original.duplicate(str(temp_dir))
+        local_repo_duplicate = local_repo_original.duplicate(temp_dir.name)
         self.local_repo: LocalRepository = local_repo_duplicate
         self.temp_dir: TemporaryDirectory = temp_dir
 
