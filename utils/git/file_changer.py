@@ -24,11 +24,15 @@ class FileChanger:
 
     @staticmethod
     def _get_random_file_name():
-        return uuid4().hex() + random.choice(FileChanger.FILE_EXTANTIONS)
+        return uuid4().hex + random.choice(FileChanger.FILE_EXTANTIONS)
 
     def __init__(self, path, average_file_count=10):
         self.path = path
         self.average_file_count = average_file_count
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+        if not os.path.isdir(self.path):
+            raise FileChangerError
 
     def _add_one_new_file(self, new_file_path=None):
         if not new_file_path:
@@ -76,7 +80,7 @@ class FileChanger:
 
     def get_file_list(self):
         file_list = []
-        obj_names_in_path = next(os.walk())[1]
+        obj_names_in_path = next(os.walk(self.path))[2]
         for name in obj_names_in_path:
             full_path = os.path.join(self.path, name)
             if os.path.isfile(full_path):

@@ -5,6 +5,8 @@ import shutil
 from tempfile import TemporaryDirectory
 
 from git import Git
+from git.repo import Repo as GitRepo
+from git.exc import InvalidGitRepositoryError
 
 from utils.git.file_changer import FileChanger
 
@@ -18,15 +20,37 @@ class LocalRepositoryException(Exception):
 
 class LocalRepository:
     def __init__(self, location: str, origin_url: str):
-        if not LocalRepository.exists(location):
+        if not LocalRepository.exists(location, origin_url):
             LocalRepository.make_from_origin(location, origin_url)
         self.location = location
+        self.origin_url = origin_url
         self._git = Git(location)
         self._git_git = Git(os.path.join(location, ".git"))
 
     @staticmethod
-    def exists(location):
-        pass
+    def exists(location: str, origin_url: str):
+        if not os.path.exists(location):
+            print("not os.path.exists(location)")
+            return False
+        try:
+            check_repo = GitRepo(location)
+        except InvalidGitRepositoryError:
+            print("InvalidGitRepositoryError")
+            return False
+
+        if check_repo.remote("origin").url != origin_url:
+            print('check_repo.remote("origin").url != origin_url')
+            print(check_repo.remote("origin").url, "!=", origin_url)
+            return False
+
+        dot_git_git_location = os.path.join(location, ".git", ".git")
+        if not os.path.exists(dot_git_git_location):
+            print("not os.path.exists(dot_git_git_location)")
+            return False
+
+        # also could've checked if it's `git pull`-able
+
+        return True
 
     @staticmethod
     def make_from_origin(location: str, origin_url: str):
@@ -36,7 +60,7 @@ class LocalRepository:
             raise LocalRepositoryException
         if len(os.listdir(location)) > 0:
             # not empty
-            raise LocalRepositoryException
+            raise LocalRepositoryException(location)
 
         _git = Git(location)
         _git.clone(origin_url, ".")
@@ -47,6 +71,7 @@ class LocalRepository:
         _git_git.commit(message="git-git")
 
         with TemporaryDirectory() as temp_dir:
+            os.rmdir(temp_dir)
             shutil.copytree(location, temp_dir)
             _git_to_push = Git(temp_dir)
             file_changer = FileChanger(
@@ -65,12 +90,14 @@ class LocalRepository:
         return LocalRepository(location, origin_url)
 
     def duplicate(self, dup_location):
+        os.rmdir(dup_location)
         shutil.copytree(self.location, dup_location)
-        return LocalRepository(dup_location)
+        return LocalRepository(dup_location, self.origin_url)
 
     def pull(self):
         self._git.pull()
 
     def revert_pull(self):
         self._git.reset(f"HEAD~{COMMITS_AHEAD_COUNT}", hard=True)
+        self._git_git.clean("-df")
         self._git_git.restore(".")
