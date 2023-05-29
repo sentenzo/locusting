@@ -1,10 +1,15 @@
 from __future__ import annotations
 
-import shutil
 import os
+import shutil
+from tempfile import TemporaryDirectory
 
 from git import Git
 
+from utils.git.file_changer import FileChanger
+
+COMMITS_AHEAD_COUNT = 10
+DIR_TO_BE_CHANGED = "b23df497a9"  # a random name
 
 
 class LocalRepositoryException(Exception):
@@ -41,17 +46,31 @@ class LocalRepository:
         _git_git.add(".")
         _git_git.commit(message="git-git")
 
+        with TemporaryDirectory() as temp_dir:
+            shutil.copytree(location, temp_dir)
+            _git_to_push = Git(temp_dir)
+            file_changer = FileChanger(
+                os.path.join(temp_dir, DIR_TO_BE_CHANGED)
+            )
+            for i in range(COMMITS_AHEAD_COUNT):
+                confirmation = (
+                    "Yes, I know this action will irreversibly delete my files "
+                    "on the path specified."
+                )
+                file_changer.change_files(confirmation)
+                _git_to_push.add(".")
+                _git_to_push.commit(message=f"load testing commit #{i}")
+            _git_to_push.push()
 
-
-
-
+        return LocalRepository(location, origin_url)
 
     def duplicate(self, dup_location):
         shutil.copytree(self.location, dup_location)
         return LocalRepository(dup_location)
 
     def pull(self):
-        pass
+        self._git.pull()
 
     def revert_pull(self):
-        pass
+        self._git.reset(f"HEAD~{COMMITS_AHEAD_COUNT}", hard=True)
+        self._git_git.restore(".")
