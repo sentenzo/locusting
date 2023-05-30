@@ -5,8 +5,8 @@ import shutil
 from tempfile import TemporaryDirectory
 
 from git import Git
-from git.repo import Repo as GitRepo
 from git.exc import InvalidGitRepositoryError
+from git.repo import Repo as GitRepo
 
 from utils.git.file_changer import FileChanger
 
