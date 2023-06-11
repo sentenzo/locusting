@@ -8,7 +8,7 @@ from git import Git
 from git.exc import InvalidGitRepositoryError
 from git.repo import Repo as GitRepo
 
-from utils.git.file_changer import FileChanger
+from utils.file_changer import FileChanger
 
 COMMITS_AHEAD_COUNT = 10
 DIR_TO_BE_CHANGED = "b23df497a9"  # a random name

@@ -2,8 +2,8 @@ from tempfile import TemporaryDirectory
 
 from locust import User, between, events, run_single_user, task
 
-from utils.config import git_config as config
-from utils.git.local_repo import LocalRepository
+from git_.config import config
+from git_.local_repo import LocalRepository
 from utils.locust_helpers import self_firing
 
 

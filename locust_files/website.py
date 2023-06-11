@@ -1,8 +1,7 @@
 from locust import HttpUser, between, run_single_user, task
-from locust.clients import HttpSession
 
-from utils.config import website_config as config
-from utils.web.parser import parse_login_csrf
+from web.config import config
+from web.parser import parse_login_csrf
 
 
 class WebUser(HttpUser):
