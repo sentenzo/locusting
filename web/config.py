@@ -1,4 +1,4 @@
-from __future__ import annotations
+from functools import cached_property
 
 import dotenv
 from pydantic import BaseSettings, Field
@@ -16,33 +16,28 @@ class Project(BaseSettings):
     name: str = Field(env="REPONAME")
 
 
-class Urls:
+class Urls(BaseSettings):
     login: str = "/auth/login"
-    main: str
-    branches: str
-    tags: str
+    _username: str = Field(env="USERNAME")
+    _projectname: str = Field(env="REPONAME")
 
-    def __init__(self, config: WebsiteConfig) -> None:
-        username = config.user.username
-        project_name = config.project.name
-        self.main = f"/project/{username}/{project_name}"
-        self.branches = f"/project/{username}/{project_name}/branch"
-        self.tags = f"/project/{username}/{project_name}/tag"
+    @cached_property
+    def main(self) -> str:
+        return f"/project/{self._username}/{self._projectname}"
+
+    @cached_property
+    def branches(self) -> str:
+        return f"/project/{self._username}/{self._projectname}/branch"
+
+    @cached_property
+    def tags(self) -> str:
+        return f"/project/{self._username}/{self._projectname}/tag"
 
 
 class WebsiteConfig(BaseSettings):
     user: User = User()
     project: Project = Project()
-    urls: Urls | None
-
-    def __init__(
-        self,
-        **args,
-    ) -> None:
-        super().__init__(
-            **args,
-        )
-        self.urls = Urls(self)
+    urls: Urls = Urls()
 
 
 config = WebsiteConfig()
