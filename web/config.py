@@ -33,6 +33,9 @@ class Urls(BaseSettings):
     def tags(self) -> str:
         return f"/project/{self._username}/{self._projectname}/tag"
 
+    class Config:
+        keep_untouched = (cached_property,)
+
 
 class WebsiteConfig(BaseSettings):
     user: User = User()
