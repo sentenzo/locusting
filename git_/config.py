@@ -1,33 +1,25 @@
-from __future__ import annotations
-
-import os
-
 import dotenv
+from pydantic import BaseSettings, Field
 
 dotenv.load_dotenv()
 
 
-class GitConfig:
-    git_user: GitUser
-    remote_repo: RemoteRepository
-    local_repo: LocalRepository
-
-    def __init__(self) -> None:
-        self.git_user = GitUser()
-        self.remote_repo = RemoteRepository()
-        self.local_repo = LocalRepository()
-
-
-class GitUser:
+class GitUser(BaseSettings):
     pass
 
 
 class RemoteRepository:
-    clone_url: str = os.getenv("REPOURL")
+    clone_url: str = Field(env="REPOURL")
 
 
 class LocalRepository:
-    location: str = os.getenv("LOCAL_REPO_PATH")
+    location: str = Field(env="LOCAL_REPO_PATH")
+
+
+class GitConfig(BaseSettings):
+    git_user: GitUser = GitUser()
+    remote_repo: RemoteRepository = RemoteRepository()
+    local_repo: LocalRepository = LocalRepository()
 
 
 config = GitConfig()

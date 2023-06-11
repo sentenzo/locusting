@@ -1,34 +1,48 @@
 from __future__ import annotations
 
-import os
+import dotenv
+from pydantic import BaseSettings, Field
+
+dotenv.load_dotenv()
 
 
-class WebsiteConfig:
-    user: User
-    urls: Urls
-    project: Project
-
-    def __init__(self) -> None:
-        self.user = User()
-        self.urls = Urls()
-        self.project = Project()
+class User(BaseSettings):
+    username: str = Field(env="USERNAME")
+    email: str = Field(env="EMAIL")
+    password: str = Field(env="PASSWORD")
 
 
-class User:
-    username: str = os.getenv("USERNAME")
-    email: str = os.getenv("EMAIL")
-    password: str = os.getenv("PASSWORD")
-
-
-class Project:
-    name: str = os.getenv("REPONAME")
+class Project(BaseSettings):
+    name: str = Field(env="REPONAME")
 
 
 class Urls:
     login: str = "/auth/login"
-    main: str = f"/project/{User.username}/{Project.name}"
-    branches: str = f"/project/{User.username}/{Project.name}/branch"
-    tags: str = f"/project/{User.username}/{Project.name}/tag"
+    main: str
+    branches: str
+    tags: str
+
+    def __init__(self, config: WebsiteConfig) -> None:
+        username = config.user.username
+        project_name = config.project.name
+        self.main = f"/project/{username}/{project_name}"
+        self.branches = f"/project/{username}/{project_name}/branch"
+        self.tags = f"/project/{username}/{project_name}/tag"
+
+
+class WebsiteConfig(BaseSettings):
+    user: User = User()
+    project: Project = Project()
+    urls: Urls | None
+
+    def __init__(
+        self,
+        **args,
+    ) -> None:
+        super().__init__(
+            **args,
+        )
+        self.urls = Urls(self)
 
 
 config = WebsiteConfig()
