@@ -27,7 +27,7 @@ class RemoteRepository:
 
 
 class LocalRepository:
-    location: str = "E:\\test_repo"
+    location: str = os.getenv("LOCAL_REPO_PATH")
 
 
 config = GitConfig()
