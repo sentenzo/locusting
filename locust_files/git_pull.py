@@ -27,7 +27,7 @@ def on_test_stop(environment, **kwargs):
 
 
 class GitUser(User):
-    wait_time = between(1, 5)
+    wait_time = between(0.1, 1.0)
 
     def on_start(self):
         ...
@@ -38,7 +38,7 @@ class GitUser(User):
         try:
             local_repo = git_manager.get_new_repo()
             local_repo.pull()
-            local_repo.revert_pull()
+            del local_repo
         except BufferIsEmpty:
             self.environment.reached_end = True
             self.environment.runner.quit()
