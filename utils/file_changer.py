@@ -4,6 +4,12 @@ import string
 from uuid import uuid4
 
 
+YES_I_KNOW_THIS_ACTION_DESTROYS_MY_FILES = (
+    "Yes, I know this action will irreversibly delete my files "
+    "on the path specified."
+)
+
+
 class FileChangerError(Exception):
     pass
 
@@ -88,10 +94,7 @@ class FileChanger:
         return file_list
 
     def change_files(self, confurmation=None, times=3):
-        if confurmation != (
-            "Yes, I know this action will irreversibly delete my files "
-            "on the path specified."
-        ):
+        if confurmation != YES_I_KNOW_THIS_ACTION_DESTROYS_MY_FILES:
             raise FileChangerError("Please provide a suitable confurmation.")
         for _ in range(times):
             self._choose_action()()

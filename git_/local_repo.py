@@ -8,7 +8,10 @@ from git import Git
 from git.exc import InvalidGitRepositoryError
 from git.repo import Repo as GitRepo
 
-from utils.file_changer import FileChanger
+from utils.file_changer import (
+    FileChanger,
+    YES_I_KNOW_THIS_ACTION_DESTROYS_MY_FILES,
+)
 
 COMMITS_AHEAD_COUNT = 10
 DIR_TO_BE_CHANGED = "b23df497a9"  # a random name
@@ -78,11 +81,9 @@ class LocalRepository:
                 os.path.join(temp_dir, DIR_TO_BE_CHANGED)
             )
             for i in range(COMMITS_AHEAD_COUNT):
-                confirmation = (
-                    "Yes, I know this action will irreversibly delete my files "
-                    "on the path specified."
+                file_changer.change_files(
+                    YES_I_KNOW_THIS_ACTION_DESTROYS_MY_FILES
                 )
-                file_changer.change_files(confirmation)
                 _git_to_push.add(".")
                 _git_to_push.commit(message=f"load testing commit #{i}")
             _git_to_push.push()
@@ -90,7 +91,8 @@ class LocalRepository:
         return LocalRepository(location, origin_url)
 
     def duplicate(self, dup_location):
-        os.rmdir(dup_location)
+        if os.path.isdir(dup_location):
+            os.rmdir(dup_location)
         shutil.copytree(self.location, dup_location)
         return LocalRepository(dup_location, self.origin_url)
 
