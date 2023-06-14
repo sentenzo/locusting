@@ -8,11 +8,11 @@ class GitUser(BaseSettings):
     pass
 
 
-class RemoteRepository:
+class RemoteRepository(BaseSettings):
     clone_url: str = Field(env="REPOURL")
 
 
-class LocalRepository:
+class LocalRepository(BaseSettings):
     location: str = Field(env="LOCAL_REPO_PATH")
 
 
